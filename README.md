@@ -11,18 +11,18 @@ technique to perform edge bundling.
 Take for example this map connecting locations between the east coast in
 the US and western Europe:
 
-![easteurope image 1](https://github.com/philogb/mingle/blob/master/img/easteurope1.png)
+![easteurope image 1](https://raw.github.com/philogb/mingle/master/img/easteurope1.png)
 
 The algorithm creates a proximity graph for the edges where each of the
 edges is represented by a node. Then the algorithm bundles edges as long
 as we're saving some ink in the final rendering. Here's an intermediate
 step on the bundling animation:
 
-![easteurope image 1](https://github.com/philogb/mingle/blob/master/img/easteurope2.png)
+![easteurope image 1](https://raw.github.com/philogb/mingle/master/img/easteurope2.png)
 
 And here's the final result:
 
-![easteurope image 1](https://github.com/philogb/mingle/blob/master/img/easteurope3.png)
+![easteurope image 1](https://raw.github.com/philogb/mingle/master/img/easteurope3.png)
 
 
 This implementation is solely based on the paper. The license for the code is MIT.
@@ -35,7 +35,7 @@ could use any other rendering API.
 
 [You can see an example here](http://philogb.github.io/mingle/example).
 
-![Image of Edge bundling example](https://github.com/philogb/mingle/blob/master/img/sfcommute.png)
+![Image of Edge bundling example](https://raw.github.com/philogb/mingle/master/img/sfcommute.png)
 
 ## Usage
 
