@@ -10,26 +10,29 @@
     <body>
       <header>
       <h1>
-        Example: Links connecting key locations in San Francisco.
+        Example: Some links.
       </h1>
       </header>
       <div class="description">
-        Given a graph connecting points in the bay area we use an algorithm to group edges
-        to reduce the amount of ink used to draw the graph. This is a JavaScript implementation of
+        A simple testing against a few links. This is a JavaScript implementation of
         <a href="http://www2.research.att.com/~yifanhu/PUB/edge_bundling.pdf">
           Multilevel Agglomerative Edge Bundling for Visualizing Large
           Graphs</a>. More information <a
           href="http://github.com/philogb/mingle">here</a>.
       </div>
       <div class="container">
-        <input type="range" id="bundle-level" min="0" max="1" value="1" step="0.01">
+        <label><input type="range" id="bundle-level" min="0" max="1" value="1" step="0.01"> Delta</label>
+        <label><input type="range" id="curviness" min="0" max="1" value="0" step="0.01"> Curviness</label>
+        <label><input type="range" id="angle-strength" min="1" max="50" value="10" step="0.1"> Angle</label>
+        <label><input type="range" id="neighbors" min="1" max="20" value="10" step="1"> Neighbors</label>
+        <label><input type="checkbox" id="line-type"> Line type</label>
         <div class="loading">Loading please wait...</div>
         <canvas width="500" height="500"></canvas>
       </div>
-      <script src="../lib/kdtree.js"></script>
-      <script src="../lib/philogl.js"></script>
-      <script src="../graph.js"></script>
-      <script src="../mingle.js"></script>
+      <script src="../../lib/kdtree.js"></script>
+      <script src="../../lib/philogl.js"></script>
+      <script src="../../graph.js"></script>
+      <script src="../../mingle.js"></script>
       <script src="example.js"></script>
 </body>
 </html>

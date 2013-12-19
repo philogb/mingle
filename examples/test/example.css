@@ -1,0 +1,43 @@
+html {
+  text-align: center;
+  font-family: Helvetica Neue;
+}
+
+h1 {
+  font-weight: normal;
+}
+
+label {
+  display: block;
+  text-align: left;
+  width: 500px;
+  margin: 10px auto;
+}
+
+div.loading {
+  color: #888;
+  font-style: italic;
+  margin-top: 150px;
+}
+
+div.description {
+  text-align: left;
+  max-width: 700px;
+  margin: 10px auto;
+}
+
+canvas {
+ -moz-filter: url(filter.svg#drop-shadow);
+ filter: url(filter.svg#drop-shadow);
+ filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+ -webkit-filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+
+ width: 500px;
+ height: 594px;
+ margin: auto;
+}
+
+input {
+  /*display: block;*/
+  width: 400px;
+}

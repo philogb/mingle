@@ -92,6 +92,10 @@ Graph.fromJSON = function(json) {
 };
 
 Graph.prototype = {
+  clear: function() {
+    this.nodes = {};
+    this.edges = {};
+  },
 
   //serialize
   toJSON: function() {

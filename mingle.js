@@ -187,6 +187,7 @@
   Bundler.prototype = {
     setNodes: function(nodes) {
       var i, l, graph = this.graph;
+      graph.clear();
       for (i = 0, l = nodes.length; i < l; ++i) {
         graph.addNode(nodes[i]);
       }

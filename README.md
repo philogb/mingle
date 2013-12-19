@@ -33,7 +33,7 @@ This simple example shows links connecting locations in the Bay Area.
 The rendering uses 2D Canvas but
 could use any other rendering API.
 
-[You can see an example here](http://philogb.github.io/mingle/example).
+[You can see an example here](http://philogb.github.io/mingle/examples/sf).
 
 ![Image of Edge bundling example](https://raw.github.com/philogb/mingle/master/img/sfcommute.png)
 
