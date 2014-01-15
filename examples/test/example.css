@@ -37,7 +37,7 @@ canvas {
  margin: auto;
 }
 
-input {
+input, select {
   /*display: block;*/
   width: 400px;
 }

@@ -99,18 +99,20 @@ Graph.prototype = {
 
   //serialize
   toJSON: function() {
-    var nodes = {},
-        edges = {},
+    var nodes = [],
+        edges = [],
         gNodes = this.nodes,
         gEdges = this.edges,
-        k;
+        k, from, to;
 
     for (k in gNodes) {
-      nodes[k] = gNodes[k].toJSON();
+      nodes.push(gNodes[k].toJSON());
     }
 
-    for (k in gEdges) {
-      edges[k] = gEdges[k].toJSON();
+    for (from in gEdges) {
+      for (to in gEdges[from]) {
+        edges.push(gEdges[from][to].toJSON());
+      }
     }
 
     return { nodes: nodes, edges: edges };
@@ -351,10 +353,37 @@ Graph.Node.prototype = {
       return {
         id: this.id,
         name: this.name,
-        data: this.data,
-        adjacencies: this.adjacencies
+        data: this.serializeData(this.data)
       };
     },
+
+    serializeData: function(data) {
+      var serializedData = {},
+          parents = data.parents,
+          parentsCopy, i, l;
+
+      if (parents) {
+        parentsCopy = Array(parents.length);
+        for (i = 0, l = parents.length; i < l; ++i) {
+          parentsCopy[i] = parents[i].toJSON();
+        }
+      }
+
+      for (i in data) {
+        serializedData[i] = data[i];
+      }
+
+      delete serializedData.parents;
+      delete serializedData.bundle;
+      serializedData = JSON.parse(JSON.stringify(serializedData));
+
+      if (parentsCopy) {
+        serializedData.parents = parentsCopy;
+      }
+
+      return serializedData;
+    },
+
     /*
        Method: adjacentTo
 

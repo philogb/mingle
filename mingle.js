@@ -13,6 +13,11 @@
     return Math.sqrt(a[0] * a[0] + a[1] * a[1]);
   }
 
+  function $normalize(a) {
+    var n = $norm(a);
+    return $mult(1 / n, a);
+  }
+
   function $lerp(a, b, delta) {
     return [ a[0] * (1 - delta) + b[0] * delta,
              a[1] * (1 - delta) + b[1] * delta ];
@@ -38,6 +43,21 @@
     return [ $lerp(from[0], to[0], delta), $lerp(from[1], to[1], delta) ];
   }
 
+  function cloneJSON(json) {
+    return JSON.parse( JSON.stringify( json ) );
+  }
+
+  function cloneEdge(json) {
+    var i, l = json.length, ans = Array(json.length);
+    for (i = 0; i < l; ++i) {
+      ans[i] = {
+        node: json[i].node,
+        pos: json[i].pos,
+        normal: json[i].normal && json[i].normal.slice()
+      };
+    }
+    return ans;
+  }
 
   //Extend generic Graph class with bundle methods and rendering options
   function expandEdgesHelper(node, array, collect) {
@@ -45,7 +65,7 @@
 
     if (!array.length) {
       array.push([ (coords[0] + coords[2]) / 2,
-                 (coords[1] + coords[3]) / 2 ]);
+                   (coords[1] + coords[3]) / 2 ]);
     }
 
     array.unshift([ coords[0], coords[1] ]);
@@ -60,12 +80,68 @@
     }
   }
 
+  function setNormalVector(nodeFrom, nodeTo) {
+    var node = nodeFrom || nodeTo, dir, coords, normal;
+    if (!nodeFrom || !nodeTo) {
+      coords = node.data.coords;
+      dir = [ coords[2] - coords[0], coords[3] - coords[1] ];
+      normal = [ -dir[1], dir[0] ];
+      normal = $mult(normal, 1 / $norm(normal));
+    }
+    return normal;
+  }
+
+  function createPosItem(node, pos, index, total) {
+    return {
+      node: node.toJSON(),
+      pos: pos,
+      normal: null
+    };
+  }
+
+  //Extend generic Graph class with bundle methods and rendering options
+  function expandEdgesRichHelper(node, array, collect) {
+    var coords = node.data.coords, i, l, p, ps, a, posItem;
+    ps = node.data.parents;
+    if (ps) {
+      for (i = 0, l = ps.length; i < l; ++i) {
+        a = array.slice();
+        if (!a.length) {
+          p = [ (coords[0] + coords[2]) / 2, (coords[1] + coords[3]) / 2 ];
+          posItem = createPosItem(node, p, i, l);
+          a.push(posItem);
+        }
+
+        posItem = createPosItem(node, [ coords[0], coords[1] ], i, l);
+        a.unshift(posItem);
+        posItem = createPosItem(node, [ coords[2], coords[3] ], i, l);
+        a.push (posItem);
+
+        expandEdgesRichHelper(ps[i], a, collect);
+      }
+    } else {
+      a = array.slice();
+      if (!a.length) {
+        p = [ (coords[0] + coords[2]) / 2, (coords[1] + coords[3]) / 2 ];
+        posItem = createPosItem(node, p, 0, 1);
+        a.push(posItem);
+      }
+
+      posItem = createPosItem(node, [ coords[0], coords[1] ], 0, 1);
+      a.unshift(posItem);
+      posItem = createPosItem(node, [ coords[2], coords[3] ], 0, 1);
+      a.push (posItem);
+
+      collect.push(a);
+    }
+  }
+
   Graph.Node.prototype.expandEdges = function() {
     if (this.expandedEdges) {
       return this.expandedEdges;
     }
     var ans = [];
-    expandEdgesHelper(this, [], ans);
+    expandEdgesRichHelper(this, [], ans);
     this.expandedEdges = ans;
     return ans;
   };
@@ -74,8 +150,7 @@
     var expandedEdges = this.expandEdges(),
         ans = Array(expandedEdges.length),
         min = Math.min,
-        i, l, j, n, edge, edgeCopy,
-        x0, xk, xk_x0, xi, xi_x0, xi_bar, dot, norm, norm2, c;
+        i, l, j, n, edge, edgeCopy, normal, x0, xk, xk_x0, xi, xi_x0, xi_bar, dot, norm, norm2, c, last;
 
     delta = delta || 0;
     this.unbundledEdges = this.unbundledEdges || {};
@@ -87,19 +162,35 @@
 
     for (i = 0, l = expandedEdges.length; i < l; ++i) {
       edge = expandedEdges[i];
-      edgeCopy = edge.slice();
-      x0 = edge[0];
-      xk = edge[edge.length -1];
+      last = edge.length -1;
+      edgeCopy = cloneEdge(edge);
+      //edgeCopy = cloneJSON(edge);
+      x0 = edge[0].pos;
+      xk = edge[last].pos;
       xk_x0 = $sub(xk, x0);
+
+      edgeCopy[0].unbundledPos = edgeCopy[0].pos.slice();
+      normal = $sub(edgeCopy[1].pos, edgeCopy[0].pos);
+      normal = $normalize([ -normal[1], normal[0] ]);
+      edgeCopy[0].normal = normal;
+
+      edgeCopy[last].unbundledPos = edgeCopy[edge.length - 1].pos.slice();
+      normal = $sub(edgeCopy[last].pos, edgeCopy[last -1].pos);
+      normal = $normalize([ -normal[1], normal[0] ]);
+      edgeCopy[last].normal = normal;
+
       for (j = 1, n = edge.length -1; j < n; ++j) {
-        xi = edge[j];
+        xi = edge[j].pos;
         xi_x0 = $sub(xi, x0);
         dot = $dot(xi_x0, xk_x0);
         norm = $dist(xk, x0);
         norm2 = norm * norm;
         c = dot / norm2;
         xi_bar = $add(x0, $mult(c, xk_x0));
-        edgeCopy[j] = $lerp(xi_bar, xi, delta);
+        edgeCopy[j].unbundledPos = $lerp(xi_bar, xi, delta);
+        normal = $sub(edgeCopy[j + 1].pos, edgeCopy[j - 1].pos);
+        normal = $normalize([ -normal[1], normal[0] ]);
+        edgeCopy[j].normal = normal;
       }
       ans[i] = edgeCopy;
     }
@@ -124,7 +215,7 @@
         e = edges[i];
         ctx.beginPath();
         for (j = 0, n = e.length; j < n; ++j) {
-          pos = e[j];
+          pos = e[j].unbundledPos;
           if (j == 0) {
             ctx.moveTo(pos[0], pos[1]);
           } else {
@@ -136,6 +227,80 @@
       }
     },
 
+    renderQuadratic: function(ctx, edges, options) {
+      options = options || {};
+      var lineWidth = options.lineWidth || 1,
+          fillStyle = options.fillStyle || 'gray',
+          margin = (options.margin || 0) * (options.delta || 0),
+          lengthBefore, lengthAfter,
+          index, i, l, j, k, n, e, node, pos, pos0, pos1, pos2, pos3, pos01, pos02, pos03, pos04,
+          midPos, quadStart, weightStart, posStart, nodeStart, posItem, posItemStart,
+          dist, distMin, nodeArray, nodeLength;
+
+      ctx.fillStyle = fillStyle;
+      ctx.lineWidth = lineWidth;
+      for (i = 0, l = edges.length; i < l; ++i) {
+        e = edges[i];
+        quadStart = null;
+        posStart = null;
+        nodeStart = e[0].node;
+        for (j = 0, n = e.length; j < n; ++j) {
+          posItem = e[j];
+          pos = posItem.unbundledPos;
+          if (j !== 0) {
+            pos0 = posStart || e[j - 1].unbundledPos;
+            pos = this.adjustPosition(nodeStart.id, posItem, pos, margin);
+
+            midPos = $lerp(pos0, pos, 0.5);
+            pos1 = $lerp(pos0, midPos, j === 1 ? 0 : options.curviness || 0);
+            pos3 = pos;
+            pos2 = $lerp(midPos, pos3, j === n - 1 ? 1 : (1 - (options.curviness || 0)));
+            ctx.lineWidth = nodeStart.data.weight || 1;
+            ctx.strokeStyle = nodeStart.data.color || '#000000';
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            if (quadStart) {
+              ctx.moveTo(quadStart[0], quadStart[1]);
+              ctx.quadraticCurveTo(pos0[0], pos0[1], pos1[0], pos1[1]);
+            }
+            ctx.moveTo(pos1[0], pos1[1]);
+            ctx.lineTo(pos2[0], pos2[1]);
+            ctx.stroke();
+            ctx.closePath();
+            quadStart = pos2;
+            posStart = pos;
+          }
+        }
+      }
+    },
+
+    adjustPosition: function(id, posItem, pos, margin) {
+      var nodeArray = posItem.node.data.nodeArray,
+          nodeLength, index, lengthBefore,
+          lengthAfter, k, node;
+
+      if (nodeArray) {
+        nodeLength = nodeArray.length;
+        index = Infinity;
+        lengthBefore = 0;
+        lengthAfter = 0;
+        for (k = 0; k < nodeLength; ++k) {
+          node = nodeArray[k];
+          if (node.id == id) {
+            index = k;
+          }
+          if (k < index) {
+            lengthBefore += (node.data.weight || 0) + margin;
+          } else if (k > index) {
+            lengthAfter += (node.data.weight || 0) + margin;
+          }
+        }
+        pos = $add(pos, $mult((lengthBefore - (lengthBefore + lengthAfter) / 2) * -margin, posItem.normal));
+      }
+
+      return pos;
+    },
+
     renderBezier: function(ctx, edges, options) {
       options = options || {};
       var pct = options.curviness || 0,
@@ -143,18 +308,18 @@
 
       for (i = 0, l = edges.length; i < l; ++i) {
         e = edges[i];
-        start = e[0];
-        midpoint = e[(e.length - 1) / 2];
+        start = e[0].unbundledPos;
+        midpoint = e[(e.length - 1) / 2].unbundledPos;
         if (e.length > 3) {
-          c1 = e[1];
-          c2 = e[(e.length - 1) / 2 - 1];
+          c1 = e[1].unbundledPos;
+          c2 = e[(e.length - 1) / 2 - 1].unbundledPos;
           end = $lerp(midpoint, c2, pct);
           ctx.beginPath();
           ctx.moveTo(start[0], start[1]);
           ctx.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], end[0], end[1]);
-          c1 = e[(e.length - 1) / 2 + 1];
-          c2 = e[e.length - 2];
-          end = e[e.length - 1];
+          c1 = e[(e.length - 1) / 2 + 1].unbundledPos;
+          c2 = e[e.length - 2].unbundledPos;
+          end = e[e.length - 1].unbundledPos;
           if (pct) {
             //line to midpoint + pct of something
             start = $lerp(midpoint, c1, pct);
@@ -166,7 +331,7 @@
         } else {
           ctx.beginPath();
           ctx.moveTo(start[0], start[1]);
-          end = e[e.length -1];
+          end = e[e.length -1].unbundledPos;
           ctx.lineTo(end[0], end[1]);
         }
       }
@@ -416,16 +581,19 @@
           name = node1.name + '-' + node2.name,
           nodes1 = node1.data.nodes || [ node1 ],
           nodes2 = node2.data.nodes || [ node2 ],
+          weight1 = node1.data.weight || 0,
+          weight2 = node2.data.weight || 0,
           nodes = [], ans;
 
       if (node1.id == node2.id) {
         return node1;
       }
-
       nodes.push.apply(nodes, nodes1);
       nodes.push.apply(nodes, nodes2);
       data = data || {};
       data.nodes = nodes;
+      data.nodeArray = (node1.data.nodeArray || []).concat(node2.data.nodeArray || []);
+      data.weight = weight1 + weight2;
       ans = {
         id: id,
         name: name,
@@ -442,18 +610,43 @@
           data = node.data,
           m1 = data.m1,
           m2 = data.m2,
+          weight = nodes.reduce(function(acum, n) { return acum + (n.data.weight || 0); }, 0),
           coords = data.coords,
           bundle = data.bundle,
-          nodesArray;
+          nodeArray = [],
+          i, l;
 
       if (m1) {
         coords = [ m1[0], m1[1], m2[0], m2[1] ];
+
+        //flattened nodes for cluster.
+        for (i = 0, l = nodes.length; i < l; ++i) {
+          nodeArray.push.apply(nodeArray, nodes[i].data.nodeArray || (nodes[i].data.parents ? [] : [ nodes[i] ]));
+        }
+
+        nodeArray.sort(function(a, b) {
+          var diffX = a.data.coords[0] - b.data.coords[0],
+              diffY = a.data.coords[1] - b.data.coords[1];
+
+          if (!diffX) {
+            return diffY;
+          }
+
+          return diffX;
+        });
+
+        //if (!nodeArray.length || (typeof nodeArray[0].id == 'string')) {
+          //debugger;
+        //}
+
         return {
           id: bundle.id,
           name: bundle.id,
           data: {
+            nodeArray: nodeArray,
             parents: nodes,
             coords: coords,
+            weight: weight,
             parentsInk: bundle.data.ink
           }
         };
@@ -471,10 +664,12 @@
       node1.data.ink = combinedNode.data.ink;
       node1.data.m1 = combinedNode.data.m1;
       node1.data.m2 = combinedNode.data.m2;
+      //node1.data.nodeArray = combinedNode.data.nodeArray;
 
       node2.data.ink = combinedNode.data.ink;
       node2.data.m1 = combinedNode.data.m1;
       node2.data.m2 = combinedNode.data.m2;
+      //node2.data.nodeArray = combinedNode.data.nodeArray;
     },
 
     updateGraph: function(graph, groupedNode, nodes, ids) {

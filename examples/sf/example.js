@@ -1,6 +1,8 @@
 /*global PhiloGL, Bundler, IO, Fx*/
 PhiloGL.unpack();
 
+var curviness = 0, margin = 0.3, type = 'Bezier', delta;
+
 function animate(bundle, canvas, ctx) {
   var loading = document.querySelector('.loading');
 
@@ -19,7 +21,11 @@ function animate(bundle, canvas, ctx) {
       ctx.lineWidth = 1;
       bundle.graph.each(function(node) {
         var edges = node.unbundleEdges(delta);
-        Bundler.Graph.renderBezier(ctx, edges);
+        Bundler.Graph['render' + type](ctx, edges, {
+          delta: delta,
+          margin: margin,
+          curviness: curviness
+        });
       });
     }
   });
@@ -32,15 +38,38 @@ window.addEventListener('DOMContentLoaded', function() {
       ctx = canvas.getContext('2d'),
       bundle;
 
-  document.querySelector('#bundle-level').addEventListener('change', function() {
-    var delta = +this.value;
+  function render() {
     canvas.width = canvas.width;
     ctx.strokeStyle = 'rgba(0, 200, 200, 0.2)';
     ctx.lineWidth = 1;
     bundle.graph.each(function(node) {
       var edges = node.unbundleEdges(delta);
-      Bundler.Graph.renderBezier(ctx, edges);
+      Bundler.Graph['render' + type](ctx, edges, {
+        margin: margin,
+        delta: delta,
+        curviness: curviness
+      });
     });
+  }
+
+  document.querySelector('#bundle-level').addEventListener('change', function() {
+    delta = +this.value;
+    render(canvas, ctx, bundle, delta, type, curviness);
+  });
+
+  document.querySelector('#curviness').addEventListener('change', function() {
+    curviness = +this.value;
+    render(canvas, ctx, bundle, delta, type, curviness);
+  });
+
+  document.querySelector('#margin').addEventListener('change', function() {
+    margin = +this.value;
+    render(canvas, ctx, bundle, delta, type, curviness);
+  });
+
+  document.querySelector('#line-type').addEventListener('change', function() {
+    type = this.value;
+    render(canvas, ctx, bundle, delta, type, curviness);
   });
 
   new IO.XHR({

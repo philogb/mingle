@@ -9,6 +9,7 @@ window.addEventListener('DOMContentLoaded', function() {
       neighbors = 10,
       angleStrength = 10,
       curviness = 0,
+      margin = 0,
       jsonText,
       bundle;
 
@@ -19,7 +20,9 @@ window.addEventListener('DOMContentLoaded', function() {
     bundle.graph.each(function(node) {
       var edges = node.unbundleEdges(delta);
       Bundler.Graph['render' + type](ctx, edges, {
-        curviness: curviness
+        curviness: curviness,
+        delta: delta,
+        margin: margin
       });
       //Bundler.Graph.renderLine(ctx, edges);
     });
@@ -60,6 +63,12 @@ window.addEventListener('DOMContentLoaded', function() {
     render(canvas, ctx, bundle, delta, type, curviness);
   });
 
+  document.querySelector('#margin').addEventListener('change', function() {
+    margin = +this.value;
+    render(canvas, ctx, bundle, delta, type, curviness);
+  });
+
+
   document.querySelector('#angle-strength').addEventListener('change', function() {
     angleStrength = +this.value;
     updateBundle();
@@ -73,7 +82,7 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 
   document.querySelector('#line-type').addEventListener('change', function() {
-    type = this.checked ? 'Line' : 'Bezier';
+    type = this.value;
     render(canvas, ctx, bundle, delta, type, curviness);
   });
 

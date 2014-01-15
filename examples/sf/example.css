@@ -30,8 +30,16 @@ canvas {
  margin: auto;
 }
 
-input[type=range] {
+
+label {
   display: block;
+  text-align: left;
   width: 500px;
   margin: 10px auto;
+}
+
+
+input, select {
+  /*display: block;*/
+  width: 400px;
 }
