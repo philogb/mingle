@@ -8,7 +8,7 @@ window.addEventListener('DOMContentLoaded', function() {
       type = 'Bezier',
       neighbors = 10,
       angleStrength = 10,
-      curviness = 0,
+      curviness = 1,
       margin = 0,
       jsonText,
       bundle;

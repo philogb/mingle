@@ -313,16 +313,16 @@
         if (e.length > 3) {
           c1 = e[1].unbundledPos;
           c2 = e[(e.length - 1) / 2 - 1].unbundledPos;
-          end = $lerp(midpoint, c2, pct);
+          end = $lerp(midpoint, c2, 1 - pct);
           ctx.beginPath();
           ctx.moveTo(start[0], start[1]);
           ctx.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], end[0], end[1]);
           c1 = e[(e.length - 1) / 2 + 1].unbundledPos;
           c2 = e[e.length - 2].unbundledPos;
           end = e[e.length - 1].unbundledPos;
-          if (pct) {
+          if (1 - pct) {
             //line to midpoint + pct of something
-            start = $lerp(midpoint, c1, pct);
+            start = $lerp(midpoint, c1, 1 - pct);
             ctx.lineTo(start[0], start[1]);
           }
           ctx.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], end[0], end[1]);
