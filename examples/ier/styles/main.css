@@ -1,0 +1,122 @@
+/* line 5, ../../app/styles/main.scss */
+
+body {
+  /*background: #fafafa;*/
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #999;
+  text-align: center;
+}
+
+/* line 12, ../../app/styles/main.scss */
+
+header > h1 {
+  font-family: HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #999;
+  text-align: center;
+  font-size: 30px;
+  font-weight: normal;
+  height: 30px;
+  border-bottom: 1px solid #eeeeee;
+  margin: 10px 30px 20px 30px;
+  padding-bottom: 15px;
+}
+
+/* line 24, ../../app/styles/main.scss */
+
+form {
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  column-count: 2;
+}
+
+/* line 28, ../../app/styles/main.scss */
+
+.container {
+  position: relative;
+  width: 1200px;
+  margin: 20px auto;
+}
+
+/* line 35, ../../app/styles/main.scss */
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: 1200px;
+  max-height: 600px;
+}
+
+/* line 43, ../../app/styles/main.scss */
+
+canvas#renderer {
+  -moz-filter: url(../filter.svg#drop-shadow);
+  filter: url(../filter.svg#drop-shadow);
+  -webkit-filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
+}
+
+/* line 47, ../../app/styles/main.scss */
+
+div.world-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.05;
+}
+
+/* line 54, ../../app/styles/main.scss */
+
+.world-map.philippines {
+  background: url(../images/philippines.jpg) 0 0 no-repeat;
+  -webkit-background-size: cover;
+  background-size: cover;
+}
+
+/* line 59, ../../app/styles/main.scss */
+
+.world-map.world {
+  background: url(../images/world.jpg) 0 0 no-repeat;
+  -webkit-background-size: cover;
+  background-size: cover;
+}
+
+/* line 64, ../../app/styles/main.scss */
+
+.world-map.eastwestcommute {
+  background: url(../images/world.jpg) -765px -190px repeat;
+  -webkit-background-size: 300%;
+  background-size: 300%;
+}
+
+.world-map.testcrossed {
+  /*background: black;*/
+  /*opacity: 1;*/
+  /*-webkit-background-size: 300%;*/
+  /*background-size: 300%;*/
+}
+
+/* line 69, ../../app/styles/main.scss */
+
+label {
+  display: block;
+  text-align: left;
+  width: 500px;
+  margin: 10px auto;
+}
+
+/* line 77, ../../app/styles/main.scss */
+
+input,
+select {
+  width: 300px;
+  padding: 0;
+  margin: 0;
+  margin-right: 15px;
+}
+
+/* line 84, ../../app/styles/main.scss */
+
+span {
+  color: #444;
+}

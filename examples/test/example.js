@@ -24,7 +24,6 @@ window.addEventListener('DOMContentLoaded', function() {
         delta: delta,
         margin: margin
       });
-      //Bundler.Graph.renderLine(ctx, edges);
     });
   }
 
@@ -67,7 +66,6 @@ window.addEventListener('DOMContentLoaded', function() {
     margin = +this.value;
     render(canvas, ctx, bundle, delta, type, curviness);
   });
-
 
   document.querySelector('#angle-strength').addEventListener('change', function() {
     angleStrength = +this.value;

@@ -1,4 +1,6 @@
-;(function () {
+/*global define, Float32Array */
+(function () {
+
 
   //General convenience functions and constants
   Math.PHI = (1 + Math.sqrt(5)) / 2;
@@ -93,7 +95,7 @@
 
   function createPosItem(node, pos, index, total) {
     return {
-      node: node.toJSON(),
+      node: node,//.toJSON(),
       pos: pos,
       normal: null
     };
@@ -233,49 +235,68 @@
           fillStyle = options.fillStyle || 'gray',
           margin = (options.margin || 0) * (options.delta || 0),
           lengthBefore, lengthAfter,
-          index, i, l, j, k, n, e, node, pos, pos0, pos1, pos2, pos3, pos01, pos02, pos03, pos04,
+          index, i, l, j, k, n, e, node, pos, pos0, pos1, pos2, pos3, pos01, pos02, pos03, pos04, colorFrom, colorTo, grd,
           midPos, quadStart, weightStart, posStart, nodeStart, posItem, posItemStart,
           dist, distMin, nodeArray, nodeLength;
 
       ctx.fillStyle = fillStyle;
       ctx.lineWidth = lineWidth;
+
       for (i = 0, l = edges.length; i < l; ++i) {
         e = edges[i];
         quadStart = null;
         posStart = null;
         nodeStart = e[0].node;
+        ctx.lineWidth = (Math.max(1, nodeStart.data.weight) || 1) * (options.scale || 1);
+        if (nodeStart.data.color && Array.isArray(nodeStart.data.color)) {
+          colorFrom = nodeStart.data.color[0];
+          colorTo = nodeStart.data.color[1];
+          grd = ctx.createLinearGradient(nodeStart.data.coords[0],
+                                         nodeStart.data.coords[1],
+                                         nodeStart.data.coords[2],
+                                         nodeStart.data.coords[3]);
+          grd.addColorStop(0, colorFrom);
+          grd.addColorStop(0.4, colorFrom);
+          grd.addColorStop(0.6, colorTo);
+          grd.addColorStop(1, colorTo);
+          ctx.strokeStyle = grd;
+        } else {
+          ctx.strokeStyle = nodeStart.data.color || ctx.strokeStyle;
+        }
+        ctx.globalAlpha = nodeStart.data.alpha == undefined ? 1 : nodeStart.data.alpha;
+        ctx.beginPath();
         for (j = 0, n = e.length; j < n; ++j) {
           posItem = e[j];
           pos = posItem.unbundledPos;
           if (j !== 0) {
             pos0 = posStart || e[j - 1].unbundledPos;
             pos = this.adjustPosition(nodeStart.id, posItem, pos, margin);
-
             midPos = $lerp(pos0, pos, 0.5);
             pos1 = $lerp(pos0, midPos, j === 1 ? 0 : options.curviness || 0);
             pos3 = pos;
             pos2 = $lerp(midPos, pos3, j === n - 1 ? 1 : (1 - (options.curviness || 0)));
-            ctx.lineWidth = nodeStart.data.weight || 1;
-            ctx.strokeStyle = nodeStart.data.color || '#000000';
-            ctx.lineCap = 'round';
-            ctx.beginPath();
+            //ctx.lineCap = 'butt';//'round';
+            //ctx.beginPath();
             if (quadStart) {
               ctx.moveTo(quadStart[0], quadStart[1]);
               ctx.quadraticCurveTo(pos0[0], pos0[1], pos1[0], pos1[1]);
             }
             ctx.moveTo(pos1[0], pos1[1]);
             ctx.lineTo(pos2[0], pos2[1]);
-            ctx.stroke();
-            ctx.closePath();
+            //ctx.stroke();
+            //ctx.closePath();
             quadStart = pos2;
             posStart = pos;
           }
         }
+        ctx.stroke();
+        ctx.closePath();
       }
     },
 
     adjustPosition: function(id, posItem, pos, margin) {
       var nodeArray = posItem.node.data.nodeArray,
+          epsilon = 1,
           nodeLength, index, lengthBefore,
           lengthAfter, k, node;
 
@@ -295,7 +316,9 @@
             lengthAfter += (node.data.weight || 0) + margin;
           }
         }
-        pos = $add(pos, $mult((lengthBefore - (lengthBefore + lengthAfter) / 2) * -margin, posItem.normal));
+        //remove -margin to get the line weight into account.
+        //pos = $add(pos, $mult((lengthBefore - (lengthBefore + lengthAfter) / 2) * -margin, posItem.normal));
+        pos = $add(pos, $mult((lengthBefore - (lengthBefore + lengthAfter) / 2) * epsilon, posItem.normal));
       }
 
       return pos;
@@ -309,6 +332,8 @@
       for (i = 0, l = edges.length; i < l; ++i) {
         e = edges[i];
         start = e[0].unbundledPos;
+        ctx.strokeStyle = e[0].node.data.color || ctx.strokeStyle;
+        ctx.lineWidth = e[0].node.data.weight || 1;
         midpoint = e[(e.length - 1) / 2].unbundledPos;
         if (e.length > 3) {
           c1 = e[1].unbundledPos;
@@ -423,7 +448,7 @@
         delete node.data.ink;
         ink = this.getInkValue(node);
         alpha = this.getMaxTurningAngleValue(node, m1, m2);
-        p = this.options.angleStrength || 25;
+        p = this.options.angleStrength || 1.2;
         return ink * (1 + Math.sin(alpha) / p);
     },
 
@@ -624,16 +649,9 @@
           nodeArray.push.apply(nodeArray, nodes[i].data.nodeArray || (nodes[i].data.parents ? [] : [ nodes[i] ]));
         }
 
-        nodeArray.sort(function(a, b) {
-          var diffX = a.data.coords[0] - b.data.coords[0],
-              diffY = a.data.coords[1] - b.data.coords[1];
-
-          if (!diffX) {
-            return diffY;
-          }
-
-          return diffX;
-        });
+        if (this.options.sort) {
+          nodeArray.sort(this.options.sort);
+        }
 
         //if (!nodeArray.length || (typeof nodeArray[0].id == 'string')) {
           //debugger;
@@ -699,7 +717,7 @@
           maxGroup = -Infinity,
           nodes, i, l, ids, groupedNode, connections,
           updateGraph = this.updateGraph,
-          coalesceNodes = this.coalesceNodes;
+          coalesceNodes = this.coalesceNodes.bind(this);
 
       graph.each(function(node) {
         var group = node.data.group;
@@ -807,6 +825,8 @@
   };
 
   this.Bundler = Bundler;
+
+  return Bundler;
 
 })();
 

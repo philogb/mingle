@@ -1,0 +1,94 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <title>Examples for Improved Edge Rendering for MINGLE</title>
+        <meta charset="utf-8">
+        <!-- Twitter card -->
+        <meta name="twitter:card" value="summary_large_image">
+        <meta name="twitter:site" value="@github">
+        <meta name="twitter:creator" value="@philogb">
+        <meta name="twitter:url" value="http://philogb.github.io/mingle/examples/ier">
+        <meta name="twitter:title" value="Improved Edge Rendering for MINGLE">
+        <meta name="twitter:description" value="Examples for Improved Edge Rendering for MINGLE">
+        <meta name="twitter:image:src" value="http://philogb.github.io/mingle/screen.png">
+        <!--facebook open graph-->
+        <meta property="og:type" content="article">
+        <meta property="og:title" content="Improved Edge Rendering for MINGLE">
+        <meta property="og:url" content="http://philogb.github.io/mingle/examples/ier">
+        <meta property="og:description" content="Examples for Improved Edge Rendering for MINGLE">
+        <meta property="og:site_name" content="Twitter">
+        <meta property="og:image" content="http://philogb.github.io/mingle/screen.png">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="styles/spectrum.css">
+    </head>
+    <body>
+      <header>
+      <h1>
+        Examples for Improved Edge Rendering for MINGLE
+      </h1>
+            <p>* means that a new computation for the layout is required. This
+      might take some time (5 - 10 secs)</p>
+
+    </header>
+      <form>
+        <label><input type="range" id="bundle-level" min="0" max="1" value="1" step="0.01"> Delta (<em> s </em>) - <span id="bundle-level-span"></span></label>
+        <label><input type="range" id="curviness" min="0" max="1" value="1" step="0.01"> Curviness <span id="curviness-span"></span></label>
+        <label><input type="range" id="angle-strength" min="0.1" max="5" value="3" step="0.1"> Angle* <span id="angle-strength-span"></span></label>
+        <label><input type="range" id="neighbors" min="2" max="40" value="10" step="1"> Neighbors* <span id="neighbors-span"></span></label>
+        <label><select id="sort-type">
+            <option selected>None</option>
+            <option>Max. Component</option>
+            <option>X-Axis</option>
+            <option>Y-Axis</option>
+            <option>Direction</option>
+        </select> Edge Group*</label>
+        <label><input type="range" id="margin" min="0" max="25" value="0" step="0.05"> Margin <span id="margin-span"></span></label>
+        <label><select id="line-type">
+            <option>Line</option>
+            <option>Bezier</option>
+            <option selected>Quadratic</option>
+        </select> Line type</label>
+        <label><input type="range" id="alpha" value="0.5" min="0" max="1" step="0.01"> Alpha <span id="alpha-span"></span></label>
+        <label><input type="color" id="color" value="#00cccc"> Solid Color <span id="color-span"></span></label>
+        <label><select id="color-type">
+            <option selected>Solid</option>
+            <option>Cluster</option>
+            <option>Direction</option>
+            <option>Edge</option>
+        </select> Color</label>
+        <label><select id="dataset">
+            <option selected>philippines</option>
+            <option>eastwestcommute</option>
+            <option>sfcommute</option>
+            <option>world</option>
+            <option>test</option>
+            <option>testuneven</option>
+            <option>testcrossed</option>
+        </select> Dataset*</label>
+        <label><span id="ink"></span>% Ink / Pixels</label>
+      </form>
+      <div class="container">
+        <div class="loading">Loading please wait...</div>
+
+        <div class="world-map"></div>
+        <canvas id="renderer" width="500" height="500"></canvas>
+        <canvas id="dots" width="500" height="500"></canvas>
+      </div>
+
+      <!--[if lt IE 7]>
+      <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+      <![endif]-->
+      <script src="../../lib/kdtree.js"></script>
+      <script src="../../lib/philogl.js"></script>
+      <script src="../../graph.js"></script>
+      <script src="../../mingle.js"></script>
+      <script src="loader.js"></script>
+      <script src="index.js"></script>
+</body>
+</html>
