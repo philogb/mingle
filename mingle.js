@@ -270,7 +270,7 @@
           pos = posItem.unbundledPos;
           if (j !== 0) {
             pos0 = posStart || e[j - 1].unbundledPos;
-            pos = this.adjustPosition(nodeStart.id, posItem, pos, margin);
+            pos = this.adjustPosition(nodeStart.id, posItem, pos, margin, options.delta || 0);
             midPos = $lerp(pos0, pos, 0.5);
             pos1 = $lerp(pos0, midPos, j === 1 ? 0 : options.curviness || 0);
             pos3 = pos;
@@ -278,9 +278,14 @@
             //ctx.lineCap = 'butt';//'round';
             //ctx.beginPath();
             if (quadStart) {
+              //ctx.strokeStyle = 'black';
               ctx.moveTo(quadStart[0], quadStart[1]);
               ctx.quadraticCurveTo(pos0[0], pos0[1], pos1[0], pos1[1]);
+              //ctx.stroke();
+              //ctx.closePath();
             }
+            //ctx.beginPath();
+            //ctx.strokeStyle = 'red';
             ctx.moveTo(pos1[0], pos1[1]);
             ctx.lineTo(pos2[0], pos2[1]);
             //ctx.stroke();
@@ -294,7 +299,7 @@
       }
     },
 
-    adjustPosition: function(id, posItem, pos, margin) {
+    adjustPosition: function(id, posItem, pos, margin, delta) {
       var nodeArray = posItem.node.data.nodeArray,
           epsilon = 1,
           nodeLength, index, lengthBefore,
@@ -318,7 +323,7 @@
         }
         //remove -margin to get the line weight into account.
         //pos = $add(pos, $mult((lengthBefore - (lengthBefore + lengthAfter) / 2) * -margin, posItem.normal));
-        pos = $add(pos, $mult((lengthBefore - (lengthBefore + lengthAfter) / 2) * epsilon, posItem.normal));
+        pos = $add(pos, $mult((lengthBefore - (lengthBefore + lengthAfter) / 2) * Math.min(epsilon, delta), posItem.normal));
       }
 
       return pos;
