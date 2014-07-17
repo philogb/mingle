@@ -167,7 +167,7 @@ dotsCtx = dotsCanvas.getContext('2d');
 
   var bundleLabel = document.querySelector('#bundle-level-span');
   bundleLabel.innerText = Math.round(delta * 1000) / 10 + '%';
-  document.querySelector('#bundle-level').addEventListener('change', function() {
+  document.querySelector('#bundle-level').addEventListener('mousemove', function() {
     delta = +this.value;
     bundleLabel.innerText = Math.round(delta * 1000) / 10 + '%';
     render(canvas, ctx, bundle, delta, type, curviness);
@@ -175,7 +175,7 @@ dotsCtx = dotsCanvas.getContext('2d');
 
   var curvinessLabel = document.querySelector('#curviness-span');
   curvinessLabel.innerText = Math.round(curviness * 1000) / 10 + '%';
-  document.querySelector('#curviness').addEventListener('change', function() {
+  document.querySelector('#curviness').addEventListener('mousemove', function() {
     curviness = +this.value;
     curvinessLabel.innerText = Math.round(curviness * 1000) / 10 + '%';
     render(canvas, ctx, bundle, delta, type, curviness);
@@ -183,7 +183,7 @@ dotsCtx = dotsCanvas.getContext('2d');
 
   var marginLabel = document.querySelector('#margin-span');
   marginLabel.innerText = Math.round(margin * 10) / 10;
-  document.querySelector('#margin').addEventListener('change', function() {
+  document.querySelector('#margin').addEventListener('mousemove', function() {
     margin = +this.value;
     marginLabel.innerText = Math.round(margin * 10) / 10;
     render(canvas, ctx, bundle, delta, type, curviness);
@@ -219,7 +219,7 @@ dotsCtx = dotsCanvas.getContext('2d');
 
   var alphaLabel = document.querySelector('#alpha-span');
   alphaLabel.innerText = Math.round(alpha * 10) / 10;
-  document.querySelector('#alpha').addEventListener('change', function() {
+  document.querySelector('#alpha').addEventListener('mousemove', function() {
     alpha = this.value;
     alphaLabel.innerText = Math.round(alpha * 10) / 10;
     render(canvas, ctx, bundle, delta, type, curviness);
