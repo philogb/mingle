@@ -1,7 +1,7 @@
 # Multilevel Agglomerative Edge Bundling in JavaScript
 
 This is a JavaScript implementation of the paper [Multilevel Agglomerative Edge Bundling
-for Visualizing Large Graphs](http://www2.research.att.com/~yifanhu/PUB/edge_bundling.pdf)
+for Visualizing Large Graphs](http://yifanhu.net/PUB/edge_bundling.pdf)
  (Emden R. Gansner, Yifan Hu, Stephen North, Carlos Scheidegger).
 
 The edge bundling algorithm groups edges together to minimize the amount of
